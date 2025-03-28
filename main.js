@@ -147,24 +147,20 @@ function gameBoard(){
     }
 
     function cellClicked(cell, marker){
-        const currentCell = cell;
-        const currentPlayerMarker = marker;
-        const cellIndex = cell.getAttribute("cellIndex");
-        console.log(cellIndex);
+        const row = parseInt(cell.dataset.row);
+        const column = parseInt(cell.dataset.column);
 
-        // if (cellIndex != "" || !running){
-        //     return;
-        // }
-        updateCell(currentCell, cellIndex, currentPlayerMarker);
+        if (board[row][column] != "" || !running){
+            return;
+        }
+        updateCell(cell, row, column, marker);
     }
 
-    function updateCell(cell, index, marker){
-        console.log(index);
-        // board[index] = marker;
-        cell.textContent = marker;
+    function updateCell(cell, row, column, marker){
         console.log(board);
+        board[row][column] = marker;
+        cell.textContent = marker;
     }
-
     return {cellClicked, updateCell};
 };
 
