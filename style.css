@@ -110,6 +110,10 @@ main {
     cursor: pointer;
 }
 
+.gameStatus {
+  margin: 1rem;
+}
+
 .restartBtn {
     padding-inline: 2rem;
     padding-block: 0.5rem;
