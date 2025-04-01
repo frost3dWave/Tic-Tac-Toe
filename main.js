@@ -11,6 +11,16 @@ function gameBoard(){
         }
     }
 
+    function resetBoard(){
+        for(let i=0; i<3; i++){
+            board[i] = [];
+            for(let j=0; j<3; j++){
+                board[i][j] = "";
+            }
+        }
+        return board;
+    }
+
     function cellClicked(cell, marker){
         const row = parseInt(cell.dataset.row);
         const column = parseInt(cell.dataset.column);
@@ -25,7 +35,8 @@ function gameBoard(){
         board[row][column] = marker;
         cell.textContent = marker;
     }
-    return {board, cellClicked, updateCell};
+
+    return {board, cellClicked, updateCell, resetBoard};
 };
 
 function initializeGame(){
@@ -59,28 +70,55 @@ function playerController(gameInitialize) {
         return getActivePlayer();
     }
 
+    function resetPlayer(){
+        activePlayerIndex = 0;
+        return getActivePlayer();
+    }
+
     return {
         get activePlayer() {
             return getActivePlayer();
         },
-        changeActivePlayer
+        changeActivePlayer,
+        resetPlayer
     };
 }
 
 function gameController(){
-    running = true;
+    let running = true;
     const gameInitialize = initializeGame();
     const boardGame = gameBoard();
     const playercontrol = playerController(gameInitialize);
 
+    function restartGame(){
+        // Reset the board array
+        boardGame.resetBoard();
+
+        // Clear all cell contents in the UI
+        gameInitialize.cells.forEach(cell => {
+            cell.textContent = "";
+        });
+
+        // Reset the active player
+        const initialPlayer = playercontrol.resetPlayer();
+        
+        // Update game status
+        gameInitialize.gameStatus.textContent = `${initialPlayer}'s turn`;
+
+        running = true;
+    }
+
     gameInitialize.gameStatus.textContent = `${playercontrol.activePlayer}'s turn`;
     
     gameInitialize.cells.forEach(cell => cell.addEventListener("click", (e) => { 
+        if (!running) return;
         
         boardGame.cellClicked(e.target, playercontrol.activePlayer);
         
         checkWinner();
     }));
+
+    gameInitialize.restartBtn.addEventListener("click", restartGame);
 
     function checkWinner(){
         const winConditions = [
@@ -108,15 +146,12 @@ function gameController(){
     
             // Check if cells are not empty and match
             if(cellA && cellA === cellB && cellB === cellC){
-                // console.log("Win condition found!");
                 roundWon = true;
                 break;
             }
         }
     
-        // Check for board fullness (draw)
         const isBoardFull = boardGame.board.every(row => row.every(cell => cell !== ""));
-    
     
         if (roundWon){
             gameInitialize.gameStatus.textContent = `${playercontrol.activePlayer} wins!`;
@@ -130,4 +165,6 @@ function gameController(){
             playercontrol.changeActivePlayer();
         }
     }
-};
+}
+
+gameController();
